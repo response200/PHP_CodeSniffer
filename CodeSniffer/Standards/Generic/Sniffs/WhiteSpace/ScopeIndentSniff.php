@@ -107,7 +107,15 @@ class Generic_Sniffs_WhiteSpace_ScopeIndentSniff implements PHP_CodeSniffer_Snif
      *
      * @var int[]
      */
-    public $ignoreLines = array();
+    protected $ignoreLines = array();
+
+    /**
+     * The current PHP_CodeSniffer file that we are processing. Needed for
+     * emptying $ignoreLines between files.
+     *
+     * @var PHP_CodeSniffer_File
+     */
+    protected $currentFile = null;
 
     /**
      * Any scope openers that should not cause an indent.
@@ -151,6 +159,11 @@ class Generic_Sniffs_WhiteSpace_ScopeIndentSniff implements PHP_CodeSniffer_Snif
      */
     public function process(PHP_CodeSniffer_File $phpcsFile, $stackPtr)
     {
+        if ($this->currentFile !== $phpcsFile) {
+            $this->currentFile = $phpcsFile;
+            $this->ignoreLines = array();
+        }
+
         $debug = PHP_CodeSniffer::getConfigData('scope_indent_debug');
         if ($debug !== null) {
             $this->_debug = (bool) $debug;
